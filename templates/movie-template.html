@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .movie-details {
+            border: 1px solid #ccc;
+            padding: 15px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="movie-details">
+        <h1>{{ title }}</h1>
+        <p><strong>Release Date:</strong> {{ release_date }}</p>
+        <p><strong>Vote Average:</strong> {{ vote_average }}</p>
+        <img src="{{ poster_image }}" alt="{{ title }} Poster">
+    </div>
+</body>
+</html>
