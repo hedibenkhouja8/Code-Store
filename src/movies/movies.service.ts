@@ -24,12 +24,26 @@ export class MoviesService {
   }
 
   async fetchPopularMovies() {
-    const response = this.httpService.get(`${this.apiBase}/movie/popular`, {
-        params: { api_key: this.apiKey },
-      });
-      const { data } = await firstValueFrom(response);
-      return data.results;
-    }
+    const movies = [];
+    let page = 1;
+    let totalPages;
+
+    do {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.apiBase}/movie/popular`, {
+          params: { api_key: this.apiKey, page },
+        }),
+      );
+
+      movies.push(...response.data.results);
+      totalPages = 15;
+      // totalPages = response.data.total_pages;
+      page += 1;
+    } while (page <= totalPages);
+
+    return movies;
+  }
+
 
     async fetchMovieById(movieId: string) {
         const response = this.httpService.get(`${this.apiBase}/movie/${movieId}`, {
@@ -86,17 +100,19 @@ export class MoviesService {
 async generateMoviesPdf(): Promise<Uint8Array> {
 
   const movies = await this.fetchPopularMovies();
-  
+
   const movieListHtml = movies.map(movie => `
     <div class="card mb-3">
-      <div class="card-body">
-        <h5 class="card-title">
-          <a href="/movies/${movie.id}">${movie.title}</a>
-        </h5>
-        <p class="card-text"><strong>Release Date:</strong> ${movie.release_date}</p>
-        <p class="card-text"><strong>Vote Average:</strong> ${movie.vote_average}</p>
+    <div class="row g-0">
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">${movie.title}</h5>
+          <p class="card-text"><strong>Release Date:</strong> ${movie.release_date}</p>
+          <p class="card-text"><strong>Vote Average:</strong> ${movie.vote_average}</p>
+        </div>
       </div>
     </div>
+  </div>
   `).join('');
 
   const templatePath = path.resolve(__dirname,'..', '..', 'templates', 'popular-movies-template.html');

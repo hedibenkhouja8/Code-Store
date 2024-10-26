@@ -9,19 +9,7 @@ export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
 
-
   @Get()
-  async getPopularMovies(@Res() res: Response) {
-    const movies = await this.moviesService.fetchPopularMovies();
-    const pdfBuffer = await this.moviesService.generatePdf(movies);
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename="movies.pdf"',
-    });
-    res.send(pdfBuffer);
-  }
-
-  @Get('popular/pdf')
   async getPopularMoviesPdf(@Res() res: Response) {
     try {
       const pdfBuffer = await this.moviesService.generateMoviesPdf();
