@@ -30,7 +30,7 @@ export class MoviesService {
 
     do {
       const response = await firstValueFrom(
-        this.httpService.get(`${this.apiBase}/movie/popular`, {
+        this.httpService.get(`${this.apiBase}/popular`, {
           params: { api_key: this.apiKey, page },
         }),
       );
@@ -46,7 +46,7 @@ export class MoviesService {
 
 
     async fetchMovieById(movieId: string) {
-        const response = this.httpService.get(`${this.apiBase}/movie/${movieId}`, {
+        const response = this.httpService.get(`${this.apiBase}/${movieId}`, {
           params: { api_key: this.apiKey },
         });
         const { data } = await firstValueFrom(response);
