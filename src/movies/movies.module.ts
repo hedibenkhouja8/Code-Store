@@ -5,10 +5,7 @@ import { MoviesService } from './movies.service';
 import { MoviesController } from './movies.controller';
 
 @Module({
-  imports: [
-    HttpModule,       
-    ConfigModule,     
-  ],
+  imports: [HttpModule, ConfigModule],
   providers: [MoviesService],
   controllers: [MoviesController],
 })
