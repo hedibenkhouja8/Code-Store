@@ -13,10 +13,15 @@ import { Response } from 'express';
 export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
+  /*
+    Generates a PDF containing the list of movies Endpoint
+  */
+
   @Get()
-  async getPopularMoviesPdf(@Res() res: Response) {
+  async generatePopularMoviesPdf(@Res() res: Response) {
     try {
-      const pdfBuffer = await this.moviesService.generateMoviesPdf();
+      const movies = await this.moviesService.fetchPopularMovies();
+      const pdfBuffer = await this.moviesService.generateMoviesPdf(movies);
       const buffer = Buffer.from(pdfBuffer);
 
       res.set({
@@ -36,7 +41,7 @@ export class MoviesController {
   }
 
   @Get(':id/')
-  async getMoviePdf1(@Param('id') id: string, @Res() res: Response) {
+  async generateMoviePdf(@Param('id') id: string, @Res() res: Response) {
     const movieData = await this.moviesService.fetchMovieById(id);
     const pdfBuffer = await this.moviesService.generatePdf(movieData);
 

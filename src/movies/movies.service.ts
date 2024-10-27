@@ -11,6 +11,7 @@ export class MoviesService {
   private readonly apiKey: string;
   private readonly apiBase: string;
   private readonly imageUrl: string;
+  private readonly localLink: string;
 
   constructor(
     private readonly httpService: HttpService,
@@ -19,36 +20,43 @@ export class MoviesService {
     this.apiKey = this.configService.get<string>('API_KEY');
     this.apiBase = this.configService.get<string>('API_BASE_URL');
     this.imageUrl = this.configService.get<string>('IMAGE_URL');
+    this.localLink = this.configService.get<string>('LOCAL_LINK');
   }
+
+  /*                          
+    Fetches Popular movies
+  */
 
   async fetchPopularMovies() {
-    const movies = [];
-    let page = 1;
-    let totalPages;
+    const response = await firstValueFrom(
+      this.httpService.get(`${this.apiBase}/popular`, {
+        params: { api_key: this.apiKey },
+      }),
+    );
 
-    do {
-      const response = await firstValueFrom(
-        this.httpService.get(`${this.apiBase}/popular`, {
-          params: { api_key: this.apiKey, page },
-        }),
-      );
+    // By default we only fetch the first page movies
+    // if we ever need to fetch all pages movies we need to loop depending on the number of pages
 
-      movies.push(...response.data.results);
-      totalPages = 15;
-      // totalPages = response.data.total_pages;
-      page += 1;
-    } while (page <= totalPages);
-
-    return movies;
+    return response.data.results;
   }
+
+  /*                          
+    Fetches a movie by id
+  */
 
   async fetchMovieById(movieId: string) {
-    const response = this.httpService.get(`${this.apiBase}/${movieId}`, {
-      params: { api_key: this.apiKey },
-    });
-    const { data } = await firstValueFrom(response);
-    return data;
+    const response = await firstValueFrom(
+      this.httpService.get(`${this.apiBase}/${movieId}`, {
+        params: { api_key: this.apiKey },
+      }),
+    );
+
+    return response.data;
   }
+
+  /*
+  Generates pdf with data of one movie
+  */
 
   async generatePdf(movieData: any): Promise<Uint8Array> {
     const templatePath = path.resolve(
@@ -94,17 +102,19 @@ export class MoviesService {
     }
   }
 
-  async generateMoviesPdf(): Promise<Uint8Array> {
-    const movies = await this.fetchPopularMovies();
+  /*
+  Generates pdf with multiple movies data
+  */
 
-    const movieListHtml = movies
+  async generateMoviesPdf(moviesData: any): Promise<Uint8Array> {
+    const movieListHtml = moviesData
       .map(
         (movie) => `
     <div class="card mb-3">
     <div class="row g-0">
       <div class="col-md-8">
         <div class="card-body">
-          <h5 class="card-title">${movie.title}</h5>
+          <a href="${this.localLink}/movies/${movie.id}"  target="_blank"> <h5 class="card-title">${movie.title}</h5></a>
           <p class="card-text"><strong>Release Date:</strong> ${movie.release_date}</p>
           <p class="card-text"><strong>Vote Average:</strong> ${movie.vote_average}</p>
         </div>
