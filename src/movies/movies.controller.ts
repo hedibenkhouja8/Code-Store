@@ -5,16 +5,16 @@ import {
   Res,
   HttpException,
   HttpStatus,
-} from '@nestjs/common';
-import { MoviesService } from './movies.service';
-import { Response } from 'express';
+} from "@nestjs/common";
+import { MoviesService } from "./movies.service";
+import { Response } from "express";
 
-@Controller('movies')
+@Controller("movies")
 export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
   /*
-    Generates a PDF containing the list of movies Endpoint
+    Endpoint to generate and download a PDF document containing a list of popular movies.
   */
 
   @Get()
@@ -25,32 +25,36 @@ export class MoviesController {
       const buffer = Buffer.from(pdfBuffer);
 
       res.set({
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename="popular-movies.pdf"',
-        'Content-Length': buffer.length,
+        "Content-Type": "application/pdf",
+        "Content-Disposition": 'attachment; filename="popular-movies.pdf"',
+        "Content-Length": buffer.length,
       });
 
       return res.send(buffer);
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
       throw new HttpException(
-        'Failed to generate PDF',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        "Failed to generate PDF",
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  @Get(':id/')
-  async generateMoviePdf(@Param('id') id: string, @Res() res: Response) {
+  /*
+    Endpoint to generate and download a PDF document containing details of a specific movie.
+  */
+
+  @Get(":id/")
+  async generateMoviePdf(@Param("id") id: string, @Res() res: Response) {
     const movieData = await this.moviesService.fetchMovieById(id);
     const pdfBuffer = await this.moviesService.generatePdf(movieData);
 
     const buffer = Buffer.from(pdfBuffer);
 
     res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="movie-${id}.pdf"`,
-      'Content-Length': buffer.length,
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="movie-${id}.pdf"`,
+      "Content-Length": buffer.length,
     });
 
     res.send(buffer);
